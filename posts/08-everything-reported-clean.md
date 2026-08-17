@@ -9,9 +9,12 @@ So I wrote a checker. A list of patterns, run over every file, non-zero exit on 
 
 It passed. It passed every single time I ran it.
 
-It was also wrong in four separate ways, and every one of them was reporting clean the entire time
+It was also wrong in five separate ways, and every one of them was reporting clean the entire time
 it was wrong. Which makes this the same post as [post 2](02-nothing-crashed.md), except the thing
 quietly doing nothing was the thing whose only job was to catch things quietly doing nothing.
+
+Four of those I found before publishing. The fifth I found afterwards, and by then it had already
+let something through.
 
 ---
 
@@ -135,12 +138,52 @@ Scan the messages. Read them like a stranger would.
 Every check now gets tested in both directions before I trust it: a file containing a value it must
 catch, and the clean tree it must not fire on.
 
-That's the entire methodology and it would have caught three of the four immediately. The
+That's the entire methodology and it would have caught three of the first four immediately. The
 case-sensitivity bug dies the first time you feed it a capitalised word. The broken lookahead dies
 the first time you plant an address and watch the check print `clean` anyway. The escaped form dies
 the moment you test against a real map file instead of a hand-written example.
 
 **If I can't make a check fail on demand, I don't believe it when it passes.**
+
+---
+
+## The fifth, found after publishing
+
+I wrote that section, and then I published the repo.
+
+What I had not done — and did not notice I had not done — was run it. "Every check now gets tested
+in both directions" was a rule I had written down. It was not a script that existed.
+
+When I finally wrote the script, thirteen checks proved they could fail on demand. One did not:
+
+```bash
+check "wireguard keys" '\b[A-Za-z0-9+/]{42}[A-Za-z0-9+/=]{1}=\b'
+```
+
+A WireGuard key is 43 base64 characters and a trailing `=`. That final `\b` sits after the `=`, and
+`=` is not a word character — so the boundary only holds when a word character *follows* the key.
+At the end of a line there is nothing to bound against, and the end of a line is where every config
+file on earth puts one.
+
+Plant a key mid-line with a letter after it and the check fires. Write it the way WireGuard writes
+it and the check is silent. It had been silent since the day I wrote it.
+
+What it missed was a real server `PublicKey`, in the VPN section of the public server runbook, in a
+block where the client private key and the WAN address had both been correctly replaced with
+placeholders. It had never been in the substitution maps, so the port scripts had nothing to swap it
+for and no other check had an opinion about it. One real value in a paragraph of placeholders, which
+is the hardest thing there is to catch by reading — and I had read that file twice, looking for
+exactly this.
+
+It's a public key, and the endpoint beside it is scrubbed, so on its own it points at nothing. It's
+still key material the scrubbing existed to remove, and it's still in the history at the initial
+commit, because the repo was already public by the time I found it. Rotating the keypair is cheaper
+than rewriting a published history, and the lab is off anyway.
+
+The part worth keeping isn't the regex. It's that the section immediately above this one — the one
+recommending canary tests, in a post about checks that lie — was itself an untested claim.
+**Writing down the discipline is not the same as running it.** I published an argument for exactly
+that point while doing the opposite one heading earlier.
 
 ---
 
@@ -152,15 +195,17 @@ Everything I'd tell someone starting this, in order of how much it cost me:
 - **Keep the substitution map outside the repo.** It contains every value you're removing.
 - **Scan the history, not the working tree.** They are completely different questions.
 - **Read your commit messages.** Yours are longer and more candid than you remember.
-- **Canary every check in both directions.** A clean report from an untested check is worth nothing.
+- **Canary every check in both directions — and run it, don't just resolve to.** A clean report from
+  an untested check is worth nothing. Mine cost me a server key between resolving and running.
 - **Then read the whole thing anyway, slowly.** The email was found by reading. No pattern I owned
   was ever going to catch it, because I hadn't thought of it — and that's exactly the category that
   matters.
 
 The through-line of this entire series turned out to be the same sentence in a different costume:
 the failures that cost the most are the ones that report success. Seven months of that on two
-laptops, and then the tool I wrote to make sure I'd learned it did it to me one more time on the way
-out the door.
+laptops, then the tool I wrote to make sure I'd learned it did it to me one more time on the way out
+the door — and then once more after the door had shut, in the section where I explained how to stop
+it happening.
 
 ---
 

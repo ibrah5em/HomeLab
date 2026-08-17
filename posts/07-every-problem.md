@@ -339,5 +339,5 @@ all things I'd actually reach for.
 
 ---
 
-*Next: [everything reported clean](08-everything-reported-clean.md) — the four bugs in the checker
+*Next: [everything reported clean](08-everything-reported-clean.md) — the five bugs in the checker
 that was supposed to keep this repo safe to publish.*
