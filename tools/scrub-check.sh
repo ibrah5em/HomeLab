@@ -14,7 +14,15 @@ set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
 
 FAIL=0
-SCAN_PATHS=(posts docs scripts claude-setup README.md)
+SCAN_PATHS=(posts docs scripts claude-setup tools README.md)
+
+# This file defines every pattern below, and canary-check.sh plants a fake value
+# for each one, so both match nearly everything here by definition. They are exempt
+# from the *pattern* checks and deliberately NOT exempt from the literal ones: a
+# pattern or a fabricated value living here is the point, a real value never is.
+# The canary takes its known-bad literals from the external secrets file at run
+# time precisely so it never has to hold one.
+SELF=(--exclude=scrub-check.sh --exclude=canary-check.sh)
 
 # Known-bad literals live OUTSIDE this repo — committing a secret to grep for it
 # is self-defeating. One value per line, matched as fixed strings.
@@ -23,7 +31,7 @@ SECRETS_FILE="${SECRETS_FILE:-$HOME/.local/share/homelab-writeup/known-secrets.t
 check() {
   local label="$1" pattern="$2"
   local hits
-  hits=$(grep -rIinE --exclude-dir=.git "$pattern" "${SCAN_PATHS[@]}" 2>/dev/null)
+  hits=$(grep -rIinE --exclude-dir=.git "${SELF[@]}" "$pattern" "${SCAN_PATHS[@]}" 2>/dev/null)
   printf '  %-28s ' "$label"
   if [ -z "$hits" ]; then
     echo "clean"
@@ -39,7 +47,7 @@ check() {
 # substitute legitimately matches the shape we're hunting for.
 check_except() {
   local label="$1" pattern="$2" allow="$3" hits
-  hits=$(grep -rIinE --exclude-dir=.git "$pattern" "${SCAN_PATHS[@]}" 2>/dev/null | grep -vE "$allow")
+  hits=$(grep -rIinE --exclude-dir=.git "${SELF[@]}" "$pattern" "${SCAN_PATHS[@]}" 2>/dev/null | grep -vE "$allow")
   printf '  %-28s ' "$label"
   if [ -z "$hits" ]; then echo "clean"; else echo "FOUND"; echo "$hits" | sed 's/^/      /'; FAIL=1; fi
 }
@@ -53,7 +61,7 @@ echo "=== scrub check ==="
 # Allowed: RFC1918, loopback, link-local, multicast/broadcast, the RFC5737
 # documentation ranges, well-known public resolvers, and 1.2.3.x placeholders.
 printf '  %-28s ' "public IPv4"
-IP_HITS=$(grep -rIonE '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' --exclude-dir=.git "${SCAN_PATHS[@]}" 2>/dev/null \
+IP_HITS=$(grep -rIonE '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b' --exclude-dir=.git "${SELF[@]}" "${SCAN_PATHS[@]}" 2>/dev/null \
   | grep -vE ':(10\.|127\.|169\.254\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.|0\.0\.0\.0|255\.|22[4-9]\.|23[0-9]\.)' \
   | grep -vE ':(192\.0\.2\.|198\.51\.100\.|203\.0\.113\.)' \
   | grep -vE ':(1\.1\.1\.1|8\.8\.8\.8|8\.8\.4\.4|9\.9\.9\.9)$' \
@@ -106,7 +114,12 @@ fi
 # contents are, and those are caught by the tracked-env-file check below.
 check "private cred stores"  '\bhomelab\.env|gitea-token|\.homelab\b'
 check "private key material" 'BEGIN (RSA |OPENSSH |EC )?PRIVATE KEY|(Private|Preshared)Key\s*=\s*[A-Za-z0-9+/]{20,}'
-check "wireguard keys"       '\b[A-Za-z0-9+/]{42}[A-Za-z0-9+/=]{1}=\b'
+# A wg key is 43 base64 chars + '='. The previous pattern ended in \b, which after
+# a '=' only matches if a word character follows — so a key at end of line, which
+# is how every real config writes one, could never match. It missed a live server
+# PublicKey sitting in the VPN runbook. Allowlist is for CSP sha256- hashes, which
+# are the same shape and are not secrets.
+check_except "wireguard keys" '\b[A-Za-z0-9+/]{43}=' 'sha256-'
 
 # Personal identifiers that don't belong in a technical writeup.
 # Email slipped past every other check for months: no pattern here matched one, and

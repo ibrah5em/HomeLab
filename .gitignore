@@ -8,3 +8,7 @@
 # local scratch
 *.log
 .DS_Store
+
+# canary-check.sh plants these and removes them on exit; belt and braces in case
+# a run dies mid-way, since they hold deliberately secret-shaped values.
+.canary-planted.*
