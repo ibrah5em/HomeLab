@@ -47,19 +47,24 @@ Both are in here.
 
 ## The series
 
-| # | Post | Status |
+All eight are on the site — [ibrah5em.me/writing](https://ibrah5em.me/writing/), which is where
+they're maintained. This repo keeps the things you'd actually clone: the runbooks, the scripts and
+the agent setup.
+
+| # | Post | |
 |---|---|---|
-| 1 | [Two laptops and a solar system](posts/01-the-setup.md) — the setup, and the three constraints that shaped every decision | Written |
-| 2 | **[Nothing Crashed](posts/02-nothing-crashed.md)** — the bugs that cost me the most time, and why none of them threw an error | **Written** |
-| 3 | [Alerting that doesn't cry wolf](posts/03-alerting.md) — breach detection, and why my monitor kept reporting break-ins that weren't | Written |
-| 4 | [Leaving the house](posts/04-leaving-the-house.md) — migrating to an edge platform, and three gotchas that cost real time | Written |
-| 5 | [How to shut down a home lab](posts/05-shutting-down.md) — verifying 133 GB before deleting it, and the false alarm that nearly cost me a week | Written |
-| 6 | [The agent knew my servers better than I did](posts/06-the-agent-knew-more.md) — running the lab with an AI agent, and a deliberately weak password that never leaked | Written |
-| 7 | [Every problem, logged](posts/07-every-problem.md) — all 68, unabridged | Written |
-| 8 | [Everything reported clean](posts/08-everything-reported-clean.md) — five bugs in the checker that was supposed to make this repo safe to publish, one of them found after publishing | Written |
+| 1 | [Two laptops and a solar system](https://ibrah5em.me/writing/the-setup) — the setup, and the three constraints that shaped every decision | 7 min |
+| 2 | **[Nothing Crashed](https://ibrah5em.me/writing/nothing-crashed)** — the bugs that cost me the most time, and why none of them threw an error | 9 min |
+| 3 | [Alerting that doesn't cry wolf](https://ibrah5em.me/writing/alerting) — breach detection, and why my monitor kept reporting break-ins that weren't | 5 min |
+| 4 | [Leaving the house](https://ibrah5em.me/writing/leaving-the-house) — migrating to an edge platform, and three gotchas that cost real time | 6 min |
+| 5 | [How to shut down a home lab](https://ibrah5em.me/writing/shutting-down) — verifying 133 GB before deleting it, and the false alarm that nearly cost me a week | 6 min |
+| 6 | [The agent knew my servers better than I did](https://ibrah5em.me/writing/the-agent-knew-more) — running the lab with an AI agent, and a deliberately weak password that never leaked | 6 min |
+| 7 | [Every problem, logged](https://ibrah5em.me/writing/every-problem) — all 68, unabridged | 12 min |
+| 8 | [Everything reported clean](https://ibrah5em.me/writing/everything-reported-clean) — five bugs in the checker that was supposed to make this repo safe to publish, one of them found after publishing | 8 min |
 
 Start with **Nothing Crashed** if you only read one. It's the most useful standalone piece and
-needs no context from the others.
+needs no context from the others. There's an [RSS feed](https://ibrah5em.me/feed.xml) if you'd
+rather not check back.
 
 ## Documentation
 
@@ -79,7 +84,7 @@ inventory, firewall rules, container layout, and every gotcha — because that's
 before every commit. [`tools/canary-check.sh`](tools/canary-check.sh) is the one that matters more:
 it plants a value for every check and fails if any of them still reports clean. A checker nobody has
 watched fail is just a script that prints `clean`, which is [the entire subject of post
-8](posts/08-everything-reported-clean.md).
+8](https://ibrah5em.me/writing/everything-reported-clean).
 
 ## The agent setup
 
