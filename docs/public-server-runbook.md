@@ -636,7 +636,7 @@ Address = 10.0.0.X/24
 DNS = 1.1.1.1
 
 [Peer]
-PublicKey = cKwXfV2es870iRiHFvD4EEXOQelJmezvEJRguOzkjjQ=
+PublicKey = <server-public-key>
 Endpoint = <WAN-IP>:51820
 AllowedIPs = 192.168.1.0/24, 10.0.0.0/24
 EOF
