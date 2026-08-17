@@ -166,5 +166,5 @@ are in [`docs/`](../docs/).
 
 ---
 
-*Series index: [README](../README.md). If you only read one, make it
-[Nothing Crashed](02-nothing-crashed.md).*
+*Next: [every problem, logged](07-every-problem.md) — all 68, unabridged. Series index:
+[README](../README.md).*

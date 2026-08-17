@@ -56,6 +56,7 @@ Both are in here.
 | 5 | [How to shut down a home lab](posts/05-shutting-down.md) — verifying 133 GB before deleting it, and the false alarm that nearly cost me a week | Written |
 | 6 | [The agent knew my servers better than I did](posts/06-the-agent-knew-more.md) — running the lab with an AI agent, and a deliberately weak password that never leaked | Written |
 | 7 | [Every problem, logged](posts/07-every-problem.md) — all 68, unabridged | Written |
+| 8 | [Everything reported clean](posts/08-everything-reported-clean.md) — four bugs in the checker that was supposed to make this repo safe to publish | Written |
 
 Start with **Nothing Crashed** if you only read one. It's the most useful standalone piece and
 needs no context from the others.

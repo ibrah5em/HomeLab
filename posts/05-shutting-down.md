@@ -162,5 +162,5 @@ mistake was the months I spent letting the first answer settle the second one.
 
 ---
 
-*That's the series. The [runbooks](../docs/), the [scripts](../scripts/), and the
-[agent setup](../claude-setup/) are all in this repo.*
+*Next: [the agent knew my servers better than I did](06-the-agent-knew-more.md) — seven months of
+running the lab with an AI agent, and a deliberately weak password that never leaked.*
