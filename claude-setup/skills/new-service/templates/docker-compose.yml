@@ -1,0 +1,60 @@
+# ~/docker/[SERVICE]/docker-compose.yml
+# Template for a new service on x-server.
+# Place this in its own folder (~/docker/[SERVICE]/) — keeps env, build context, and
+# logs isolated from the main nginx project.
+#
+# Replace placeholders:
+#   [SERVICE]        kebab-case name (matches container_name + nginx upstream)
+#   [IMAGE]          either a registry image OR remove `image:` and add `build: .`
+#   [PORT]           the internal port the app listens on (NOT a host port)
+#   [PINNED_IP]      a free address in 172.18.0.0/16 — only if DNAT/UFW needs it
+#                    (omit the whole networks: block override if not pinning)
+
+services:
+  [SERVICE]:
+    # Choose ONE of: pre-built image, or local build
+    image: [IMAGE]
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+
+    container_name: [SERVICE]
+    restart: unless-stopped
+
+    # Internal port only — never expose ports on the host.
+    # nginx-ssl proxies to this container by name on the docker_management network.
+    expose:
+      - "[PORT]"
+
+    env_file:
+      - .env
+
+    # If your image needs a writable data dir, mount a named volume here.
+    # volumes:
+    #   - [SERVICE]-data:/app/data
+
+    networks:
+      docker_management:
+        # Pin the IP ONLY if DNAT rules in /etc/ufw/before.rules depend on it.
+        # Otherwise delete these two lines and let Docker assign.
+        ipv4_address: [PINNED_IP]
+
+    # Healthcheck — adjust the test to something cheap the app supports.
+    # nginx-watcher reads container state via `docker inspect`.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:[PORT]/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+# Reference the existing shared network — never create a new one
+networks:
+  docker_management:
+    external: true
+    name: docker_management
+
+# Uncomment if you mounted a named volume above
+# volumes:
+#   [SERVICE]-data:
+#     name: [SERVICE]-data

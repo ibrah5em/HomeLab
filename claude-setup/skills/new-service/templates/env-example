@@ -1,0 +1,28 @@
+# ~/docker/[SERVICE]/.env
+# Secrets and per-deployment config for the [SERVICE] container.
+# This file is NEVER committed to a repo. chmod 600.
+#
+# Compose loads it via `env_file: - .env` in docker-compose.yml.
+
+# ── Runtime ──────────────────────────────────────────────────────────────────
+NODE_ENV=production
+PORT=[PORT]
+LOG_LEVEL=info
+
+# ── App secrets ──────────────────────────────────────────────────────────────
+# Generate strong values:  openssl rand -hex 32
+# SESSION_SECRET=
+# JWT_SECRET=
+# DATABASE_URL=
+
+# ── External services ────────────────────────────────────────────────────────
+# If the service calls APIs blocked from Syria (Groq, Telegram, some font CDNs),
+# route them through the Cloudflare Worker pattern used by KidsApp rather than
+# adding WARP to x-server.
+# UPSTREAM_API=https://[your-cf-worker].workers.dev
+
+# ── ntfy alerting (optional) ─────────────────────────────────────────────────
+# If this service should push its own alerts, reuse the existing token.
+# NTFY_URL=https://ntfy.sh
+# NTFY_TOPIC=security-alerts
+# NTFY_TOKEN_FILE=/run/secrets/ntfy-token   # mount via compose secrets, never bake in

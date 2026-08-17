@@ -1,0 +1,10 @@
+# never commit real credentials
+*.env
+!*.env.example
+.env.*
+*token*
+!scripts/ntfy.env.example
+
+# local scratch
+*.log
+.DS_Store
