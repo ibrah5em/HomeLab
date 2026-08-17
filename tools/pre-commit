@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# pre-commit — the gate. Install with:
+#
+#   ln -sf ../../tools/pre-commit .git/hooks/pre-commit
+#
+# Always runs the scrub check. Additionally runs the canary when the commit
+# touches the checking machinery itself, because that is the only moment a check
+# can quietly lose the ability to fire — and a check that cannot fire reports
+# clean forever afterwards without anyone noticing. See post 8.
+#
+# The canary is not run on every commit on purpose: it invokes scrub-check once
+# per planted value, which is too slow to sit in front of an ordinary edit. The
+# tradeoff is that it only guards the commits that can actually break a check.
+
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 2
+
+STAGED=$(git diff --cached --name-only)
+
+if printf '%s\n' "$STAGED" | grep -qE '^tools/(scrub-check|canary-check|pre-commit)\.sh$|^tools/(scrub-check|canary-check|pre-commit)$'; then
+  echo "=== commit touches the checker — canary first ==="
+  if ! ./tools/canary-check.sh; then
+    echo
+    echo "Refusing the commit: a check cannot detect what it exists to detect."
+    exit 1
+  fi
+  echo
+fi
+
+exec ./tools/scrub-check.sh
